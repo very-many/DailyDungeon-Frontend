@@ -1,11 +1,17 @@
 ---
-import Welcome from '../components/Welcome.astro';
+import Dungeon from '../components/Dungeon.astro';
 import Layout from '../layouts/Layout.astro';
-
-// Welcome to Astro! Wondering what to do next? Check out the Astro documentation at https://docs.astro.build
-// Don't want to use any of this? Delete everything in this file, the `assets`, `components`, and `layouts` directories, and start fresh.
 ---
 
 <Layout>
-	<Welcome />
+	<h1 class="font-primary my-8 text-center text-2xl underline sm:text-3xl">
+		Dungeons &amp; Diagrams
+	</h1>
+	<a
+		href="/seed"
+		class="font-primary mb-6 block text-center text-xs text-cyan-400 transition-colors hover:text-cyan-300"
+	>
+		Play a custom seed →
+	</a>
+	<Dungeon puzzleUrl="https://daily-dungeon-backend.vercel.app/api/v1/dungeon/daily" />
 </Layout>

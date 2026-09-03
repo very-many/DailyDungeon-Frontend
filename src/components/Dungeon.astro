@@ -1,0 +1,14 @@
+---
+interface Props {
+  puzzleUrl?: string;
+}
+const { puzzleUrl = '/example.json' } = Astro.props;
+---
+
+<div id="dungeon" data-puzzle-url={puzzleUrl} class="flex flex-col items-center gap-4 p-6">
+  <p id="dungeon-status" class="font-primary min-h-6 text-center text-sm text-slate-400">
+    Loading puzzle…
+  </p>
+</div>
+
+<script src="../scripts/dungeon.ts"></script>

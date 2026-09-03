@@ -1,0 +1,39 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout>
+	<h1 class="font-primary my-8 text-center text-2xl underline sm:text-3xl">
+		Dungeons &amp; Diagrams
+	</h1>
+	<a
+		href="/"
+		class="font-primary mb-6 block text-center text-xs text-cyan-400 transition-colors hover:text-cyan-300"
+	>
+		← Daily dungeon
+	</a>
+	<form id="seed-form" class="flex w-full max-w-sm flex-col items-center gap-4 px-6">
+		<label for="seed-input" class="font-primary text-xs text-slate-400">Seed</label>
+		<input
+			id="seed-input"
+			name="seed"
+			type="text"
+			placeholder="XXXXXX"
+			autocomplete="off"
+			class="font-primary w-full rounded border border-slate-700 bg-slate-900 px-4 py-3 text-center text-sm text-slate-100 placeholder-slate-600 focus:border-cyan-400 focus:outline-none"
+		/>
+		<button
+			type="submit"
+			class="font-primary cursor-pointer rounded bg-cyan-600 px-6 py-3 text-xs text-white transition-colors hover:bg-cyan-500"
+		>
+			Load dungeon
+		</button>
+	</form>
+	<div id="dungeon" class="flex flex-col items-center gap-4 p-6">
+		<p id="dungeon-status" class="font-primary min-h-6 text-center text-sm text-slate-400">
+			Enter a seed to generate a dungeon.
+		</p>
+	</div>
+</Layout>
+
+<script src="../scripts/seed.ts"></script>
