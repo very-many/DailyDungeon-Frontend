@@ -1,9 +1,11 @@
 ---
 import Dungeon from '../components/Dungeon.astro';
+import ToggleDarkmode from '../components/ToggleDarkmode.astro';
 import Layout from '../layouts/Layout.astro';
 ---
 
 <Layout>
+	<ToggleDarkmode class="m-auto" />
 	<h1 class="font-primary my-8 text-center text-2xl underline sm:text-3xl">
 		Dungeons &amp; Diagrams
 	</h1>
@@ -15,3 +17,5 @@ import Layout from '../layouts/Layout.astro';
 	</a>
 	<Dungeon puzzleUrl="https://daily-dungeon-backend.vercel.app/api/v1/dungeon/daily" />
 </Layout>
+
+

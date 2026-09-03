@@ -15,8 +15,8 @@ const BASE_CELL = [
   'border',
   'border-slate-700/60',
   'text-sm',
-  'sm:h-12',
-  'sm:w-12',
+  'sm:h-17',
+  'sm:w-17',
   'sm:text-base',
 ].join(' ');
 
@@ -191,7 +191,7 @@ export class DungeonGame {
     if (occupant === 'treasure') {
       sprite.textContent = '💰';
     } else {
-      sprite.textContent = '👾';
+      sprite.className = 'monster scale-100 sm:scale-200';
       sprite.dataset.variant = String(occupant.variant); // sprite animation hook
     }
     return sprite;

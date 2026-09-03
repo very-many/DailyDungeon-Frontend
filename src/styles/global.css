@@ -1,6 +1,8 @@
 @import url("https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap");
 @import "tailwindcss";
 
+@custom-variant dark (&:where(.dark, .dark *));
+
 html,
 body {
   font-family: "Press Start 2P", system-ui;
@@ -11,3 +13,20 @@ body {
 @theme {
     --font-primary: "Press Start 2P", system-ui;
 }
+
+@keyframes sprite {
+    from {
+      background-position: 0% 50%;
+    }
+    to {
+      background-position: 100% 50%;
+    }
+  }
+	.monster {
+		background-image: url('/Monsters/chomp_idle.png');
+		image-rendering: pixelated;
+		width: 32px;
+		height: 32px;
+		object-fit: cover;
+		animation: sprite 1s steps(3) infinite;
+	}
