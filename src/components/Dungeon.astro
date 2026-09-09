@@ -33,5 +33,28 @@ try {
     {puzzle ? 'Loading puzzle…' : 'Failed to load puzzle.'}
   </p>
 </div>
+{puzzle ? (
+  <div
+    id="dungeon-toolbar"
+    class="pointer-coarse:flex hidden flex-wrap items-center justify-center gap-4 p-6 pt-0"
+  >
+    <button
+      type="button"
+      data-tool="wall"
+      aria-pressed="true"
+      class="font-primary cursor-pointer rounded border border-slate-700 bg-slate-900 px-4 py-3 text-xs text-slate-300 transition-colors"
+    >
+      🧱 Wall
+    </button>
+    <button
+      type="button"
+      data-tool="mark"
+      aria-pressed="false"
+      class="font-primary cursor-pointer rounded border border-slate-700 bg-slate-900 px-4 py-3 text-xs text-slate-300 transition-colors"
+    >
+      ✕ Mark
+    </button>
+  </div>
+) : null}
 
 <script src="../scripts/dungeon.ts"></script>

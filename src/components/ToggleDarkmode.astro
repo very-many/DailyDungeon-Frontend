@@ -138,7 +138,7 @@ const { class: className = "" } = Astro.props;
         }
     }
 
-    button.addEventListener("click", () => setOpen(menu.hidden));
+    button.addEventListener("click", () => setOpen(menu.hidden === true));
 
     for (const option of options) {
         option.addEventListener("click", () => {

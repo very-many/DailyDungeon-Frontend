@@ -23,8 +23,8 @@ const BASE_CELL = [
 const CORNER_CELL = `${BASE_CELL} cursor-default bg-slate-800`;
 const HEADER_CELL = `${BASE_CELL} cursor-default bg-slate-800 font-bold text-cyan-200`;
 const OCCUPIED_CELL = `${BASE_CELL} cursor-default bg-amber-50`;
-const EMPTY_CELL = `${BASE_CELL} cursor-pointer bg-amber-50 hover:bg-amber-100`;
-const WALL_CELL = `${BASE_CELL} cursor-pointer bg-slate-900`;
+const EMPTY_CELL = `${BASE_CELL} cursor-pointer touch-none bg-amber-50 hover:bg-amber-100`;
+const WALL_CELL = `${BASE_CELL} cursor-pointer touch-none bg-slate-900`;
 
 const STATUS_IDLE = 'font-primary min-h-6 text-center text-sm text-slate-400';
 const STATUS_WON = 'font-primary min-h-6 text-center text-sm text-emerald-400';
@@ -32,6 +32,9 @@ const STATUS_WON = 'font-primary min-h-6 text-center text-sm text-emerald-400';
 /** States for the row/column count labels. */
 const COUNT_SATISFIED = 'opacity-40';
 const COUNT_OVER = 'text-red-400';
+
+/** The tools available on touch devices (selected via the mobile toolbar). */
+type Tool = 'wall' | 'mark';
 
 export class DungeonGame {
   private readonly root: HTMLElement;
@@ -42,8 +45,14 @@ export class DungeonGame {
   private marks: boolean[][] = []; // true = "not a wall" marker
   private won = false;
 
+  /** Tool used for touch input; mouse keeps its left/right button mapping. */
+  private tool: Tool = 'wall';
+
   private dragging = false;
   private paint: PaintAction | null = null;
+
+  /** Timestamp of the last touch end, used to ignore synthetic mouse events. */
+  private lastTouchEnd = 0;
 
   private readonly occupied = new Map<string, CellOccupant>();
 
@@ -56,6 +65,11 @@ export class DungeonGame {
     this.root = document.getElementById(rootId)!;
     this.statusEl = document.getElementById(statusId)!;
     document.addEventListener('mouseup', () => this.stopDrag());
+    document.addEventListener('touchend', () => this.stopTouchDrag());
+    document.addEventListener('touchcancel', () => this.stopTouchDrag());
+    document.addEventListener('touchmove', (event: TouchEvent) => this.onTouchMove(event), {
+      passive: false,
+    });
   }
 
   /** Set up the game from server-inlined puzzle data. */
@@ -69,6 +83,11 @@ export class DungeonGame {
     this.renderGrid();
     this.statusEl.className = STATUS_IDLE;
     this.statusEl.textContent = 'Fill in the walls!';
+  }
+
+  /** Switch the tool used for touch input (mobile toolbar). */
+  setTool(tool: Tool): void {
+    this.tool = tool;
   }
 
   private reset(): void {
@@ -167,6 +186,14 @@ export class DungeonGame {
 
     this.cells[y] ??= [];
     this.cells[y][x] = cell;
+
+    // Coordinates are exposed via data attributes so the touch handler can
+    // resolve the cell under a finger via elementFromPoint while dragging.
+    cell.dataset.x = String(x);
+    cell.dataset.y = String(y);
+    cell.addEventListener('touchstart', (event: TouchEvent): void => this.onCellTouchStart(event, x, y), {
+      passive: false,
+    });
     cell.addEventListener('mousedown', (event: MouseEvent): void => this.onCellMouseDown(event, x, y));
     cell.addEventListener('mouseenter', (): void => this.onCellMouseEnter(x, y));
   }
@@ -252,6 +279,9 @@ export class DungeonGame {
 
   private onCellMouseDown(event: MouseEvent, x: number, y: number): void {
     if (this.won) return;
+    // Browsers may fire synthetic mouse events right after a touch gesture;
+    // those are already handled by the touch handlers.
+    if (Date.now() - this.lastTouchEnd < 400) return;
     event.preventDefault(); // avoid text selection while dragging
 
     if (event.button === 0) {
@@ -276,12 +306,19 @@ export class DungeonGame {
 
   private onCellMouseEnter(x: number, y: number): void {
     if (!this.dragging || !this.paint) return;
+    this.paintCell(x, y);
+  }
 
-    if (this.paint.type === 'wall') {
-      this.walls[y][x] = this.paint.value;
+  /** Apply the active paint action to the cell at (x, y). */
+  private paintCell(x: number, y: number): void {
+    const paint = this.paint;
+    if (!paint) return;
+
+    if (paint.type === 'wall') {
+      this.walls[y][x] = paint.value;
       this.marks[y][x] = false;
     } else {
-      this.marks[y][x] = this.paint.value;
+      this.marks[y][x] = paint.value;
       this.walls[y][x] = false;
     }
 
@@ -290,9 +327,54 @@ export class DungeonGame {
     this.checkWin();
   }
 
+  // ---- Touch support ----------------------------------------------------
+
+  private onCellTouchStart(event: TouchEvent, x: number, y: number): void {
+    if (this.won) return;
+    // Prevent scrolling and the synthetic mouse events some browsers fire.
+    event.preventDefault();
+
+    if (this.tool === 'wall') {
+      this.walls[y][x] = !this.walls[y][x];
+      this.marks[y][x] = false;
+      this.paint = { type: 'wall', value: this.walls[y][x] };
+    } else {
+      this.marks[y][x] = !this.marks[y][x];
+      this.walls[y][x] = false;
+      this.paint = { type: 'mark', value: this.marks[y][x] };
+    }
+
+    this.dragging = true;
+    this.applyCellState(this.cells[y][x], x, y);
+    this.updateCounts();
+    this.checkWin();
+  }
+
+  private onTouchMove(event: TouchEvent): void {
+    if (!this.dragging || !this.paint) return;
+    event.preventDefault(); // keep the browser from scrolling mid-drag
+
+    const touch = event.touches[0];
+    if (!touch) return;
+
+    const target = document.elementFromPoint(touch.clientX, touch.clientY);
+    const cell = target instanceof HTMLElement ? target.closest<HTMLElement>('[data-x][data-y]') : null;
+    if (!cell) return;
+
+    const x = Number(cell.dataset.x);
+    const y = Number(cell.dataset.y);
+    if (Number.isNaN(x) || Number.isNaN(y)) return;
+    this.paintCell(x, y);
+  }
+
   private stopDrag(): void {
     this.dragging = false;
     this.paint = null;
+  }
+
+  private stopTouchDrag(): void {
+    this.stopDrag();
+    this.lastTouchEnd = Date.now();
   }
 
   // ---- Win condition ----------------------------------------------------

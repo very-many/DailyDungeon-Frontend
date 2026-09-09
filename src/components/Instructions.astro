@@ -1,0 +1,33 @@
+---
+
+
+---
+
+<ul class="list-decimal text-sm text-slate-400 max-w-prose space-y-3 pl-16 pr-4 m-auto">
+  <li>
+    Shade squares to create <span class="text-cyan-200">walls</span> and complete the map of the dungeon.
+  </li>
+  <li>
+    Printed <span class="text-cyan-200">numbers</span> indicate the number of walls in that row or column.
+  </li>
+  <li>
+    Every unshaded square is either a <span class="text-cyan-200">hallway</span> or part of a <span class="text-cyan-200">treasure room</span>.
+  </li>
+  <li>
+    Treasure rooms are always 3×3 with a single entrance and a single piece of <span class="text-cyan-200">treasure.</span>
+  </li>
+  <li>
+    Hallways are always one square wide. This means that, outside of treasure rooms, there will never be a 2×2 block of unshaded squares.
+  </li>
+  <li>
+    Every dead end contains a <span class="text-cyan-200">monster</span>. Every monster is in a dead end.
+  </li>
+  <li>
+    All unshaded squares are connected into a <span class="text-cyan-200">single contiguous shape</span>.
+  </li>
+  <li>
+    Diagonally adjacent squares are <span class="text-cyan-200">never</span> considered to be adjacent.
+  </li>
+</ul>
+
+<script src="../scripts/dungeon.ts"></script>
