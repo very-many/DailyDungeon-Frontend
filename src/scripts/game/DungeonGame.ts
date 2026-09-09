@@ -28,7 +28,6 @@ const WALL_CELL = `${BASE_CELL} cursor-pointer bg-slate-900`;
 
 const STATUS_IDLE = 'font-primary min-h-6 text-center text-sm text-slate-400';
 const STATUS_WON = 'font-primary min-h-6 text-center text-sm text-emerald-400';
-const STATUS_ERROR = 'font-primary min-h-6 text-center text-sm text-red-400';
 
 /** States for the row/column count labels. */
 const COUNT_SATISFIED = 'opacity-40';
@@ -59,23 +58,9 @@ export class DungeonGame {
     document.addEventListener('mouseup', () => this.stopDrag());
   }
 
-  async load(puzzleUrl: string): Promise<void> {
-    this.statusEl.className = STATUS_IDLE;
-    this.statusEl.textContent = 'Loading puzzle…';
-
-    try {
-      const response: Response = await fetch(puzzleUrl);
-      if (!response.ok) {
-        throw new Error(`Request failed with status ${response.status}`);
-      }
-      this.puzzle = (await response.json()) as Puzzle;
-    } catch {
-      this.puzzle = null;
-      this.statusEl.className = STATUS_ERROR;
-      this.statusEl.textContent = 'Failed to load puzzle.';
-      return;
-    }
-
+  /** Set up the game from server-inlined puzzle data. */
+  loadPuzzle(puzzle: Puzzle): void {
+    this.puzzle = puzzle;
     this.reset();
     this.indexOccupants();
     this.walls = this.emptyGrid();

@@ -1,13 +1,36 @@
 ---
 interface Props {
-  puzzleUrl?: string;
+  puzzleUrl: string;
 }
-const { puzzleUrl = '/example.json' } = Astro.props;
+const { puzzleUrl } = Astro.props;
+
+let puzzle: unknown = null;
+try {
+  const url = new URL(puzzleUrl, Astro.url);
+  const response: Response = await fetch(url);
+  if (!response.ok) {
+    throw new Error(`Request failed with status ${response.status}`);
+  }
+  puzzle = await response.json();
+} catch {
+  puzzle = null;
+}
 ---
 
-<div id="dungeon" data-puzzle-url={puzzleUrl} class="flex flex-col items-center gap-4 p-6">
-  <p id="dungeon-status" class="font-primary min-h-6 text-center text-sm text-slate-400">
-    Loading puzzle…
+<div
+  id="dungeon"
+  data-puzzle={puzzle ? JSON.stringify(puzzle) : undefined}
+  class="flex flex-col items-center gap-4 p-6"
+>
+  <p
+    id="dungeon-status"
+    class={
+      puzzle
+        ? 'font-primary min-h-6 text-center text-sm text-slate-400'
+        : 'font-primary min-h-6 text-center text-sm text-red-400'
+    }
+  >
+    {puzzle ? 'Loading puzzle…' : 'Failed to load puzzle.'}
   </p>
 </div>
 
