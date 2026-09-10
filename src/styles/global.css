@@ -17,17 +17,16 @@ body {
 
 @keyframes sprite {
     from {
-      background-position: 0% 50%;
+      background-position: 0 50%;
     }
     to {
-      background-position: 100% 50%;
+      background-position: -128px 50%;
     }
   }
-	.monster {
-		background-image: url('/Monsters/chomp_idle.png');
-		image-rendering: pixelated;
-		width: 32px;
-		height: 32px;
-		object-fit: cover;
-		animation: sprite 1s steps(3) infinite;
-	}
+.monster {
+  background-image: url('/Monsters/chomp_idle.png');
+  image-rendering: pixelated;
+  width: 32px;
+  height: 32px;
+  animation: sprite 1.5s steps(4) infinite;
+}
