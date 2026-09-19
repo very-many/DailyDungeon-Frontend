@@ -1,21 +1,119 @@
 ---
-import Dungeon from '../components/Dungeon.astro';
-import Instructions from '../components/Instructions.astro';
-import Layout from '../layouts/Layout.astro';
+import Footer from "../components/Footer.astro";
+import Icon from "../components/Icon.astro";
+import Instructions from "../components/Instructions.astro";
+import SectionHeading from "../components/SectionHeading.astro";
+import Layout from "../layouts/Layout.astro";
+
+export const prerender = false;
+
+const heroTiles = Array.from({ length: 5 });
+
+const buttons = {
+    base: "inline-flex items-center gap-2 border-4 px-6 py-4 font-primary text-[10px] leading-4 tracking-wide transition hover:-translate-y-0.5 active:translate-x-0.75 active:translate-y-0.75 active:shadow-none focus-visible:ring-2 focus-visible:ring-gold sm:px-8 sm:text-xs",
+    primary: "border-content bg-highlight text-background shadow-button-primary",
+    secondary: "border-line bg-elevated text-content shadow-button-secondary",
+};
 ---
 
 <Layout>
-	<h1 class="font-primary my-8 text-center text-2xl underline sm:text-3xl">
-		Dungeons &amp; Diagrams
-	</h1>
-	<a
-		href="/seed"
-		class="font-primary mb-6 block text-center text-xs text-cyan-400 transition-colors hover:text-cyan-300"
-	>
-		Play a custom seed →
-	</a>
-	<Dungeon puzzleUrl="https://daily-dungeon-backend.vercel.app/api/v1/dungeon/daily" />
-	<Instructions />
+    <main class="mx-auto flex w-full max-w-3xl flex-1 flex-col px-4 pb-16">
+        <!-- Hero -->
+        <section class="relative flex flex-col items-center pt-14 pb-12">
+            <div aria-hidden="true" class="pointer-events-none absolute inset-0">
+                <Icon name="star" class="absolute top-6 left-2 size-3 text-highlight/70" />
+                <Icon name="star" class="absolute top-20 left-10 size-2 text-gold/60" />
+                <Icon name="star" class="absolute top-10 right-4 size-2 text-highlight/50" />
+                <Icon name="star" class="absolute top-28 right-12 size-3 text-gold/40" />
+            </div>
+
+            <div class="flex justify-center gap-2.5">
+                {
+                    heroTiles.map(() => (
+                        <span class="flex w-16 items-center justify-center">
+                            <span class="monster w-16 sm:scale-200" />
+                        </span>
+                    ))
+                }
+            </div>
+
+            <h1
+                class="pt-9 text-center text-3xl leading-[1.55] tracking-[3px] text-highlight sm:text-5xl"
+            >
+                <span class="block ">DAILY</span>
+                <span class="block">DUNGEON</span>
+            </h1>
+
+            <p class="pt-5 text-center text-[8px] leading-5 text-tertiary sm:text-[9px]">
+                One dungeon · One day · Something idk
+            </p>
+
+            <div class="flex flex-wrap justify-center gap-4 pt-9">
+                <a href="/daily" class:list={[buttons.base, buttons.primary]}>
+                    <Icon name="sword" class="size-4" />
+                    PLAY TODAY
+                </a>
+                <a href="/seed" class:list={[buttons.base, buttons.secondary]}>
+                    <Icon name="dice" class="size-4" />
+                    CUSTOM
+                </a>
+            </div>
+        </section>
+
+        <Instructions />
+
+        <!-- Game modes -->
+        <section class="pt-12">
+            <SectionHeading label="GAME MODES" />
+
+            <div class="grid gap-4 pt-6 sm:grid-cols-2">
+                <a
+                    href="/daily"
+                    class="flex flex-col justify-center border-[3px] border-line bg-surface px-6 py-7 shadow-glow transition-colors hover:border-highlight focus-visible:ring-2 focus-visible:ring-highlight"
+                >
+                    <div class="flex items-center gap-3">
+                        <Icon name="calendar" class="size-8 text-content" />
+                        <span class="text-xs leading-5 text-highlight">
+                            <span class="block">DAILY</span>
+                            <span class="block">DUNGEON</span>
+                        </span>
+                    </div>
+                    <p class="pt-3.5 text-[8px] leading-5 text-tertiary sm:text-[9px]">
+                        Fresh dungeon every day. Same puzzle for everyone. Compete with other peepol!
+                    </p>
+                    <span
+                        class="mt-5 inline-flex items-center gap-2 self-start border-2 border-highlight px-3 py-1 text-[7px] leading-3 tracking-wide text-highlight sm:text-[8px]"
+                    >
+                        PLAY NOW
+                        <Icon name="arrow-right" class="size-3" />
+                    </span>
+                </a>
+
+                <a
+                    href="/seed"
+                    class="flex flex-col justify-center border-[3px] border-line bg-surface px-6 py-7 shadow-glow transition-colors hover:border-gold focus-visible:ring-2 focus-visible:ring-gold"
+                >
+                    <div class="flex items-center gap-3">
+                        <Icon name="dice" class="size-8 text-content" />
+                        <span class="text-xs leading-5 text-gold">
+                            <span class="block">CUSTOM</span>
+                            <span class="block">DUNGEON</span>
+                        </span>
+                    </div>
+                    <p class="pt-3.5 text-[8px] leading-5 text-tertiary sm:text-[9px]">
+                        Enter any seed to conjure a unique dungeon. Same seed = same dungeon. Share
+                        with peepol!
+                    </p>
+                    <span
+                        class="mt-5 inline-flex items-center gap-2 self-start border-2 border-gold px-3 py-1 text-[7px] leading-3 tracking-wide text-gold sm:text-[8px]"
+                    >
+                        GENERATE
+                        <Icon name="arrow-right" class="size-3" />
+                    </span>
+                </a>
+            </div>
+        </section>
+    </main>
+
+    <Footer />
 </Layout>
-
-

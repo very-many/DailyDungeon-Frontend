@@ -1,0 +1,24 @@
+---
+import Icon from "./Icon.astro";
+---
+
+<footer
+    class="mt-auto flex flex-col items-center border-t-2 border-line bg-surface px-6 py-8"
+>
+    <div class="flex items-center gap-3">
+        <span aria-hidden="true" class="h-0.5 w-8 bg-line sm:w-12"></span>
+        <p class="flex items-center gap-3 text-[10px] leading-4 tracking-[3px] text-highlight">
+            <Icon name="sword" class="size-3" />
+            DAILY DUNGEON
+            <Icon name="sword" class="size-3" />
+        </p>
+        <span aria-hidden="true" class="h-0.5 w-8 bg-line sm:w-12"></span>
+    </div>
+
+    <p class="pt-3 text-center text-[7px] leading-5 text-tertiary sm:text-[8px]">
+        A new puzzle every day · Something idk
+    </p>
+    <p class="flex items-center gap-2 text-center text-[6px] leading-5 text-tertiary sm:text-[7px]">
+        Inspired by Dungeons &amp; Diagrams
+    </p>
+</footer>

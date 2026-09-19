@@ -1,9 +1,11 @@
+import { MARK_ICON, TREASURE_ICON } from './icons';
 import type { CellOccupant, PaintAction, Puzzle } from './types';
 
 /**
  * Tailwind class tokens are kept as literal strings so Tailwind's scanner
  * picks them up. Cell appearance is composed by joining a shared base with a
- * state-specific suffix.
+ * state-specific suffix. Colours come from the theme variables in global.css,
+ * so the board follows the light/dark theme.
  */
 const BASE_CELL = [
   'flex',
@@ -13,25 +15,25 @@ const BASE_CELL = [
   'justify-center',
   'select-none',
   'border',
-  'border-slate-700/60',
   'text-sm',
   'sm:h-17',
   'sm:w-17',
   'sm:text-base',
 ].join(' ');
 
-const CORNER_CELL = `${BASE_CELL} cursor-default bg-slate-800`;
-const HEADER_CELL = `${BASE_CELL} cursor-default bg-slate-800 font-bold text-cyan-200`;
-const OCCUPIED_CELL = `${BASE_CELL} cursor-default bg-amber-50`;
-const EMPTY_CELL = `${BASE_CELL} cursor-pointer touch-none bg-amber-50 hover:bg-amber-100`;
-const WALL_CELL = `${BASE_CELL} cursor-pointer touch-none bg-slate-900`;
+const CORNER_CELL = `${BASE_CELL} cursor-default border-board-line bg-board-header`;
+const HEADER_CELL = `${BASE_CELL} cursor-default border-board-line bg-board-header font-bold text-highlight`;
+const OCCUPIED_CELL = `${BASE_CELL} cursor-default border-board-line bg-board-occupied`;
+const EMPTY_CELL = `${BASE_CELL} cursor-pointer touch-none border-board-line bg-board hover:bg-board-hover`;
+const WALL_CELL = `${BASE_CELL} cursor-pointer touch-none border-wall bg-wall`;
 
-const STATUS_IDLE = 'font-primary min-h-6 text-center text-sm text-slate-400';
-const STATUS_WON = 'font-primary min-h-6 text-center text-sm text-emerald-400';
+const STATUS_BASE = 'font-primary min-h-6 text-center text-xs sm:text-sm';
+const STATUS_IDLE = `${STATUS_BASE} text-tertiary`;
+const STATUS_WON = `${STATUS_BASE} text-highlight`;
 
 /** States for the row/column count labels. */
 const COUNT_SATISFIED = 'opacity-40';
-const COUNT_OVER = 'text-red-400';
+const COUNT_OVER = 'text-mark';
 
 /** The tools available on touch devices (selected via the mobile toolbar). */
 type Tool = 'wall' | 'mark';
@@ -130,7 +132,7 @@ export class DungeonGame {
     if (!puzzle) return;
 
     const grid: HTMLDivElement = document.createElement('div');
-    grid.className = 'grid border-2 border-slate-900';
+    grid.className = 'grid border-2 border-board-line bg-board';
     grid.style.gridTemplateColumns = `repeat(${puzzle.width + 1}, auto)`;
 
     for (let row = 0; row <= puzzle.height; row++) {
@@ -201,9 +203,10 @@ export class DungeonGame {
   private buildSprite(occupant: CellOccupant): HTMLSpanElement {
     const sprite: HTMLSpanElement = document.createElement('span');
     if (occupant === 'treasure') {
-      sprite.textContent = '💰';
+      sprite.className = 'flex';
+      sprite.innerHTML = TREASURE_ICON;
     } else {
-      sprite.className = 'monster scale-100 sm:scale-200';
+      sprite.className = 'monster scale-100 sm:scale-200 bg-position-[50%]';
       sprite.dataset.variant = String(occupant.variant); // sprite animation hook
     }
     return sprite;
@@ -228,8 +231,8 @@ export class DungeonGame {
     cell.className = EMPTY_CELL;
     if (this.marks[y][x]) {
       const marker: HTMLSpanElement = document.createElement('span');
-      marker.className = 'text-slate-400';
-      marker.textContent = '✕';
+      marker.className = 'flex';
+      marker.innerHTML = MARK_ICON;
       cell.replaceChildren(marker);
     } else {
       cell.replaceChildren();
@@ -382,7 +385,7 @@ export class DungeonGame {
   private checkWin(): void {
     if (this.won || !this.isSolved()) return;
     this.won = true;
-    this.statusEl.textContent = 'You win! 🎉';
+    this.statusEl.textContent = 'You win!';
     this.statusEl.className = STATUS_WON;
   }
 

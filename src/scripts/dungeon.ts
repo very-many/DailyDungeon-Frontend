@@ -4,8 +4,8 @@ import type { Puzzle } from './game/types';
 type Tool = 'wall' | 'mark';
 
 /** Class tokens for the active/inactive states of the mobile tool buttons. */
-const TOOL_ACTIVE = ['border-cyan-400', 'bg-cyan-600', 'text-white'];
-const TOOL_INACTIVE = ['border-slate-700', 'bg-slate-900', 'text-slate-300'];
+const TOOL_ACTIVE = ['border-highlight', 'bg-highlight', 'text-background'];
+const TOOL_INACTIVE = ['border-line', 'bg-elevated', 'text-tertiary'];
 
 // The puzzle is fetched server-side and inlined by Dungeon.astro. If the
 // backend was unreachable, the server already rendered an error message.

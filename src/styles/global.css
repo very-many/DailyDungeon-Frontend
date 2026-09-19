@@ -5,28 +5,81 @@
 
 html,
 body {
-  font-family: "Press Start 2P", system-ui;
-  font-weight: 400;
-  font-style: normal;
-  overflow: auto;
+    font-family: "Press Start 2P", system-ui;
+    font-weight: 400;
+    font-style: normal;
+    overflow: auto;
 }
 
 @theme {
     --font-primary: "Press Start 2P", system-ui;
+
+    --color-primary: #166534; /* Forest green, softer than original */
+    --color-muted: #e5e5e5; /* Light gray for subtle elements */
+    --color-tertiary: #94a3b8; /* Slate blue-gray, Notion-like */
+    --color-surface: #E6E0D0; /* Pure white for surfaces */
+    --color-accent: #64748b; /* Grayscale accent with bluish tint */
+    --color-secondary: #dcfce7; /* Very light green for highlights */
+    --color-content: #0f172a; /* Almost black, but softer */
+    --color-background: #EEEAE0; /* Off-white background, Notion-like */
+    --color-line: #d6cfc0; /* Hairlines, dividers and borders */
+    --color-elevated: #f6f2e8; /* Slightly raised surfaces (navbar tiles) */
+    --color-highlight: #2f6f7a; /* Teal accent, marks the active nav item */
+    --color-gold: #8a6d1f; /* Secondary accent (custom dungeons, headings) */
+    --color-mark: #a8563f; /* Player marks / warnings */
+
+    /* Dungeon board */
+    --color-board: #fbf3e6; /* Playable cell */
+    --color-board-hover: #f2e6c9; /* Playable cell under the cursor */
+    --color-board-line: #d3c9b3; /* Grid lines */
+    --color-board-header: #ded7c4; /* Row/column count gutter */
+    --color-board-occupied: #f0e2bd; /* Cells that are given (treasure, monster) */
+    --color-wall: #24313f; /* Shaded wall */
+
+    --shadow-nav: 0 2px 20px 0 rgb(100 40 200 / 0.18);
+    --shadow-panel: 3px 3px 0 0 var(--color-line); /* Hard pixel drop shadow */
+    --shadow-panel-lg: 4px 4px 0 0 var(--color-line);
+    --shadow-button-primary: 5px 5px 0 0 var(--color-gold);
+    --shadow-button-secondary: 5px 5px 0 0 rgb(0 0 0 / 0.4);
+    --shadow-glow: 0 8px 24px 0 rgb(122 191 200 / 0.14);
+}
+
+.dark {
+    --color-primary: #4ade80; /* Brighter green for dark mode */
+    --color-muted: #334155; /* Muted slate color */
+    --color-tertiary: #64748b; /* Medium gray with blue tint */
+    --color-surface: #161C28; /* Dark blue-gray for surfaces */
+    --color-accent: #94a3b8; /* Medium-light gray accent */
+    --color-secondary: #064e3b; /* Dark teal-green */
+    --color-content: #f1f5f9; /* Off-white text */
+    --color-background: #10141E; /* Very dark blue-gray background */
+    --color-line: #222E42; /* Hairlines, dividers and borders */
+    --color-elevated: #1C2434; /* Slightly raised surfaces (navbar tiles) */
+    --color-highlight: #7ABFC8; /* Bright teal accent for dark mode */
+    --color-gold: #C8A85A; /* Secondary accent (custom dungeons, headings) */
+    --color-mark: #C07A6A; /* Player marks / warnings */
+
+    /* Dungeon board */
+    --color-board: #1b2231; /* Playable cell */
+    --color-board-hover: #232d40; /* Playable cell under the cursor */
+    --color-board-line: #2f3d57; /* Grid lines */
+    --color-board-header: #161c28; /* Row/column count gutter */
+    --color-board-occupied: #2a2338; /* Cells that are given (treasure, monster) */
+    --color-wall: #070a10; /* Shaded wall */
 }
 
 @keyframes sprite {
     from {
-      background-position: 0 50%;
+        background-position-x: 0;
     }
     to {
-      background-position: -128px 50%;
+        background-position-x: -128px;
     }
-  }
+}
 .monster {
-  background-image: url('/Monsters/chomp_idle.png');
-  image-rendering: pixelated;
-  width: 32px;
-  height: 32px;
-  animation: sprite 1.5s steps(4) infinite;
+    background-image: url("/Monsters/chomp_idle.png");
+    image-rendering: pixelated;
+    width: 32px;
+    height: 32px;
+    animation: sprite 1.5s steps(4) infinite;
 }

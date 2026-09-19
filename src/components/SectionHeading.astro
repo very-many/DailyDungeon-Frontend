@@ -1,0 +1,21 @@
+---
+import Icon from "./Icon.astro";
+
+interface Props {
+    label: string;
+}
+
+const { label } = Astro.props;
+---
+
+<div class="flex items-center gap-4">
+    <span aria-hidden="true" class="h-0.5 flex-1 bg-linear-to-r from-line/0 to-line"></span>
+    <h2
+        class="flex shrink-0 items-center gap-3 text-[10px] leading-4 tracking-[3px] text-gold sm:text-xs"
+    >
+        <Icon name="star" class="size-3" />
+        {label}
+        <Icon name="star" class="size-3" />
+    </h2>
+    <span aria-hidden="true" class="h-0.5 flex-1 bg-linear-to-l from-line/0 to-line"></span>
+</div>

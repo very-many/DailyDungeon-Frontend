@@ -1,4 +1,7 @@
 ---
+import Icon from "./Icon.astro";
+import { boardVars, DEFAULT_PUZZLE_SIZE, type PuzzleSize } from "../scripts/game/metrics";
+
 interface Props {
   puzzleUrl: string;
 }
@@ -15,46 +18,67 @@ try {
 } catch {
   puzzle = null;
 }
+
+// Reserve the board's footprint while loading (or when the fetch failed), so
+// nothing below the board jumps once the grid is rendered.
+function readSize(value: unknown): PuzzleSize {
+  const candidate = value as Partial<PuzzleSize> | null;
+  return typeof candidate?.width === "number" && typeof candidate?.height === "number"
+    ? { width: candidate.width, height: candidate.height }
+    : DEFAULT_PUZZLE_SIZE;
+}
+
+const size = readSize(puzzle);
+
+const toolButton =
+  'inline-flex cursor-pointer items-center gap-2 border-2 px-4 py-3 text-[9px] tracking-wide transition-colors';
 ---
 
-<div
-  id="dungeon"
-  data-puzzle={puzzle ? JSON.stringify(puzzle) : undefined}
-  class="flex flex-col items-center gap-4 p-6"
->
-  <p
-    id="dungeon-status"
-    class={
-      puzzle
-        ? 'font-primary min-h-6 text-center text-sm text-slate-400'
-        : 'font-primary min-h-6 text-center text-sm text-red-400'
-    }
-  >
-    {puzzle ? 'Loading puzzle…' : 'Failed to load puzzle.'}
-  </p>
-</div>
-{puzzle ? (
+<div class="flex w-full flex-col items-center">
   <div
-    id="dungeon-toolbar"
-    class="pointer-coarse:flex hidden flex-wrap items-center justify-center gap-4 p-6 pt-0"
+    id="dungeon"
+    data-puzzle={puzzle ? JSON.stringify(puzzle) : undefined}
+    style={boardVars(size)}
+    class="flex min-h-(--board-h) w-full flex-col items-center justify-center gap-4 overflow-x-auto border-2 border-line bg-surface p-4 shadow-panel-lg sm:min-h-(--board-h-sm) sm:w-auto sm:p-6"
   >
-    <button
-      type="button"
-      data-tool="wall"
-      aria-pressed="true"
-      class="font-primary cursor-pointer rounded border border-slate-700 bg-slate-900 px-4 py-3 text-xs text-slate-300 transition-colors"
+    <p
+      id="dungeon-status"
+      class={
+        puzzle
+          ? 'font-primary min-h-6 text-center text-xs text-tertiary sm:text-sm'
+          : 'font-primary min-h-6 text-center text-xs text-mark sm:text-sm'
+      }
     >
-      🧱 Wall
-    </button>
-    <button
-      type="button"
-      data-tool="mark"
-      aria-pressed="false"
-      class="font-primary cursor-pointer rounded border border-slate-700 bg-slate-900 px-4 py-3 text-xs text-slate-300 transition-colors"
-    >
-      ✕ Mark
-    </button>
+      {puzzle ? 'Loading puzzle…' : 'Failed to load puzzle.'}
+    </p>
   </div>
-) : null}
+  {
+    puzzle ? (
+      <div
+        id="dungeon-toolbar"
+        class="pointer-coarse:flex hidden flex-wrap items-center justify-center gap-3 pt-4"
+      >
+        <button
+          type="button"
+          data-tool="wall"
+          aria-pressed="true"
+          class:list={[toolButton, 'border-line', 'bg-elevated', 'text-tertiary']}
+        >
+          <Icon name="brick" class="size-4" />
+          WALL
+        </button>
+        <button
+          type="button"
+          data-tool="mark"
+          aria-pressed="false"
+          class:list={[toolButton, 'border-line', 'bg-elevated', 'text-tertiary']}
+        >
+          <Icon name="cross" class="size-4" />
+          MARK
+        </button>
+      </div>
+    ) : null
+  }
+</div>
 
 <script src="../scripts/dungeon.ts"></script>

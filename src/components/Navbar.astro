@@ -1,0 +1,158 @@
+---
+import Icon from "./Icon.astro";
+import ToggleDarkmode from "./ToggleDarkmode.astro";
+
+interface NavLink {
+    href: string;
+    icon: "home" | "calendar" | "dice";
+    label: string;
+}
+
+const links: NavLink[] = [
+    { href: "/", icon: "home", label: "HOME" },
+    { href: "/daily", icon: "calendar", label: "DAILY" },
+    { href: "/seed", icon: "dice", label: "CUSTOM" },
+];
+
+// Normalise trailing slashes once, then compare every link against it.
+const currentPath = Astro.url.pathname.replace(/\/+$/, "") || "/";
+
+function isCurrent(href: string): boolean {
+    if (href === "/") {
+        return currentPath === "/";
+    }
+    return currentPath === href || currentPath.startsWith(`${href}/`);
+}
+
+function itemClass(active: boolean, layout: string, activeExtra = ""): string[] {
+    return [
+        layout,
+        active
+            ? `border-highlight text-highlight ${activeExtra}`
+            : "border-transparent text-tertiary hover:text-highlight",
+    ];
+}
+---
+
+<nav class="relative z-30 border-b-[3px] border-line bg-surface shadow-nav">
+    <div class="flex h-14 items-stretch justify-between px-5">
+        <a href="/" class="flex items-center gap-2.5 px-2 text-highlight">
+            <Icon name="candle" class="size-6" />
+            <span class="text-center font-primary text-xs leading-4 tracking-widest">
+                <span class="block">DAILY</span>
+                <span class="block">DUNGEON</span>
+            </span>
+        </a>
+
+        <!-- Desktop navigation -->
+        <div class="hidden items-stretch sm:flex">
+            {
+                links.map(({ href, icon, label }) => {
+                    const active = isCurrent(href);
+
+                    return (
+                        <a
+                            href={href}
+                            aria-current={active ? "page" : undefined}
+                            class:list={itemClass(
+                                active,
+                                "flex flex-col items-center justify-center gap-1 border-b-[3px] px-4",
+                                "bg-linear-to-b from-highlight/40 to-highlight/0",
+                            )}
+                        >
+                            <Icon name={icon} class="size-4" />
+                            <span class="text-[8px] leading-3 tracking-wide">{label}</span>
+                        </a>
+                    );
+                })
+            }
+
+            <span aria-hidden="true" class="mx-1 my-3 w-px bg-line"></span>
+            <ToggleDarkmode />
+        </div>
+
+        <!-- Compact navigation -->
+        <div class="flex items-stretch sm:hidden">
+            <ToggleDarkmode />
+            <button
+                type="button"
+                data-nav-toggle
+                aria-expanded="false"
+                aria-controls="nav-menu"
+                aria-label="Open menu"
+                class="flex cursor-pointer items-center border-l border-line px-4 text-content transition-colors hover:text-highlight"
+            >
+                <Icon name="menu" class="size-5" />
+            </button>
+        </div>
+    </div>
+
+    <div
+        id="nav-menu"
+        data-nav-menu
+        hidden
+        class="absolute inset-x-0 top-full border-b-[3px] border-line bg-surface shadow-nav sm:hidden"
+    >
+        <ul class="flex flex-col p-3">
+            {
+                links.map(({ href, icon, label }) => {
+                    const active = isCurrent(href);
+
+                    return (
+                        <li>
+                            <a
+                                href={href}
+                                aria-current={active ? "page" : undefined}
+                                class:list={itemClass(
+                                    active,
+                                    "flex items-center gap-3 border-l-[3px] px-3 py-4 text-[9px] tracking-wide transition-colors",
+                                    "bg-linear-to-r from-highlight/40 to-highlight/0",
+                                )}
+                            >
+                                <Icon name={icon} class="size-4" />
+                                {label}
+                            </a>
+                        </li>
+                    );
+                })
+            }
+        </ul>
+    </div>
+</nav>
+
+<script>
+    const toggle = document.querySelector<HTMLButtonElement>("[data-nav-toggle]");
+    const menu = document.querySelector<HTMLElement>("[data-nav-menu]");
+
+    if (toggle && menu) {
+        const setOpen = (open: boolean): void => {
+            menu.hidden = !open;
+            toggle.setAttribute("aria-expanded", String(open));
+            toggle.setAttribute("aria-label", open ? "Close menu" : "Open menu");
+            if (open) {
+                document.dispatchEvent(new Event("nav:open"));
+            }
+        };
+
+        // `hidden` is typed as `boolean | "until-found"`, so compare explicitly.
+        toggle.addEventListener("click", () => setOpen(menu.hidden === true));
+
+        // Tapping a link navigates away, so close the panel right away.
+        menu.addEventListener("click", (event) => {
+            if (event.target instanceof Element && event.target.closest("a")) {
+                setOpen(false);
+            }
+        });
+
+        document.addEventListener("keydown", (event) => {
+            if (event.key === "Escape") setOpen(false);
+        });
+
+        // Opening the theme dropdown should not leave the panel behind it.
+        document.addEventListener("theme:open", () => setOpen(false));
+
+        window.matchMedia("(min-width: 40rem)").addEventListener("change", (event) => {
+            if (event.matches) setOpen(false);
+        });
+    }
+</script>
