@@ -1,76 +1,87 @@
 ---
-import Dungeon from '../components/Dungeon.astro';
-import Footer from '../components/Footer.astro';
-import Icon from '../components/Icon.astro';
-import Layout from '../layouts/Layout.astro';
-import { boardVars, DEFAULT_PUZZLE_SIZE } from '../scripts/game/metrics';
+import Dungeon from "../components/Dungeon.astro";
+import DungeonSkeleton from "../components/DungeonSkeleton.astro";
+import Footer from "../components/Footer.astro";
+import Icon from "../components/Icon.astro";
+import Layout from "../layouts/Layout.astro";
+import { boardVars, DEFAULT_PUZZLE_SIZE } from "../scripts/game/metrics";
 
-const seed = (Astro.url.searchParams.get('seed') ?? '').trim();
+const seed = (Astro.url.searchParams.get("seed") ?? "").trim();
 const puzzleUrl = seed
-  ? `https://daily-dungeon-backend.vercel.app/api/v1/dungeon?seed=${encodeURIComponent(seed)}`
-  : null;
+    ? `https://daily-dungeon-backend.vercel.app/api/v1/dungeon?seed=${encodeURIComponent(seed)}`
+    : null;
 ---
 
 <Layout>
-	<main class="mx-auto flex w-full max-w-4xl flex-1 flex-col sm:px-4 pb-16">
-		<section class="flex flex-col items-center pt-12 pb-8">
-			<h1 class="text-center text-2xl leading-[1.55] tracking-[3px] text-gold sm:text-3xl">
-				<span class="block">CUSTOM</span>
-				<span class="block">DUNGEON</span>
-			</h1>
-			<p class="pt-4 text-center text-[8px] leading-5 text-tertiary sm:text-[9px]">
-				Same seed = same dungeon
-			</p>
-			<a
-				href="/daily"
-				class="mt-6 inline-flex items-center gap-2 border-2 border-highlight px-3 py-2 text-[8px] tracking-wide text-highlight transition-colors hover:bg-highlight/10"
-			>
-				<Icon name="calendar" class="size-3" />
-				DAILY DUNGEON
-				<Icon name="arrow-right" class="size-3" />
-			</a>
-		</section>
+    <main class="mx-auto flex w-full max-w-4xl flex-1 flex-col sm:px-4 pb-16">
+        <section class="flex flex-col items-center pt-12 pb-8">
+            <h1
+                class="text-center text-2xl leading-[1.55] tracking-[3px] text-gold sm:text-3xl"
+            >
+                <span class="block">CUSTOM</span>
+                <span class="block">DUNGEON</span>
+            </h1>
+            <p
+                class="pt-4 text-center text-[8px] leading-5 text-tertiary sm:text-[9px]"
+            >
+                Same seed = same dungeon
+            </p>
+            <a
+                href="/daily"
+                class="mt-6 inline-flex items-center gap-2 border-2 border-highlight px-3 py-2 text-[8px] tracking-wide text-highlight transition-colors hover:bg-highlight/10"
+            >
+                <Icon name="calendar" class="size-3" />
+                DAILY DUNGEON
+                <Icon name="arrow-right" class="size-3" />
+            </a>
+        </section>
 
-		<form
-			id="seed-form"
-			action="/seed"
-			method="get"
-			class="mx-auto flex w-full max-w-sm flex-col items-center gap-3 pb-8"
-		>
-			<label for="seed-input" class="text-[9px] tracking-wide text-tertiary">SEED</label>
-			<input
-				id="seed-input"
-				name="seed"
-				type="text"
-				value={seed}
-				placeholder="XXXXXX"
-				autocomplete="off"
-				class="w-full border-2 border-line bg-elevated px-4 py-3 text-center text-xs text-content placeholder:text-tertiary/60 focus:border-highlight focus:outline-none"
-			/>
-			<button
-				type="submit"
-				class="mt-2 inline-flex cursor-pointer items-center gap-2 border-4 border-content bg-highlight px-6 py-3 text-[10px] tracking-wide text-background shadow-button-primary transition hover:-translate-y-0.5 active:translate-x-0.75 active:translate-y-0.75 active:shadow-none focus-visible:ring-2 focus-visible:ring-gold"
-			>
-				<Icon name="dice" class="size-4" />
-				LOAD DUNGEON
-			</button>
-		</form>
+        <form
+            id="seed-form"
+            action="/seed"
+            method="get"
+            class="mx-auto flex w-full max-w-sm flex-col items-center gap-3 pb-8"
+        >
+            <label
+                for="seed-input"
+                class="text-[9px] tracking-wide text-tertiary">SEED</label
+            >
+            <input
+                id="seed-input"
+                name="seed"
+                type="text"
+                value={seed}
+                placeholder="XXXXXX"
+                autocomplete="off"
+                class="w-full border-2 border-line bg-elevated px-4 py-3 text-center text-xs text-content placeholder:text-tertiary/60 focus:border-highlight focus:outline-none"
+            />
+            <button
+                type="submit"
+                class="mt-2 inline-flex cursor-pointer items-center gap-2 border-4 border-content bg-highlight px-6 py-3 text-[10px] tracking-wide text-background shadow-button-primary transition hover:-translate-y-0.5 active:translate-x-0.75 active:translate-y-0.75 active:shadow-none focus-visible:ring-2 focus-visible:ring-gold"
+            >
+                <Icon name="dice" class="size-4" />
+                LOAD DUNGEON
+            </button>
+        </form>
 
-		{puzzleUrl ? (
-			<Dungeon puzzleUrl={puzzleUrl} />
-		) : (
-			<div
-				id="dungeon"
-				style={boardVars(DEFAULT_PUZZLE_SIZE)}
-				class="flex min-h-(--board-h) w-full flex-col items-center justify-center gap-4 border-2 border-dashed border-line bg-surface p-6 sm:min-h-(--board-h-sm)"
-			>
-				<Icon name="dice" class="size-6 text-tertiary" />
-				<p id="dungeon-status" class="font-primary text-center text-xs text-tertiary sm:text-sm">
-					Enter a seed to generate a dungeon.
-				</p>
-			</div>
-		)}
-	</main>
+        {
+            puzzleUrl ? (
+                <Dungeon puzzleUrl={puzzleUrl} server:defer>
+                    <DungeonSkeleton slot="fallback" />
+                </Dungeon>
+            ) : (
+                <DungeonSkeleton message="">
+                    <Icon name="dice" class="size-8 text-tertiary" />
+                    <p
+                        id="dungeon-status"
+                        class="font-primary text-center text-xs text-tertiary sm:text-sm"
+                    >
+                        Enter a seed to generate a dungeon.
+                    </p>
+                </DungeonSkeleton>
+            )
+        }
+    </main>
 
-	<Footer />
+    <Footer />
 </Layout>

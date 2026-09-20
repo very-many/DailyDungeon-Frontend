@@ -32,14 +32,16 @@ export interface PuzzleSize {
 }
 
 /**
- * CSS custom properties describing the exact height of the board panel for a
+ * CSS custom properties describing the exact size of the board panel for a
  * puzzle of the given size, so a placeholder can reserve it and the layout
  * does not shift when the grid replaces it.
  *
- * The height counts one extra row for the wall counts.
+ * Both dimensions count one extra row/column for the wall counts, matching
+ * `renderGrid` in `DungeonGame.ts` (`repeat(puzzle.width + 1, auto)`).
  */
-export function boardVars({ height }: PuzzleSize): string {
+export function boardVars({ width, height }: PuzzleSize): string {
     const rows = height + 1;
+    const columns = width + 1;
 
     const base =
         rows * CELL_PX + GRID_BORDER_PX + PANEL_BORDER_PX + PANEL_PADDING_PX + GAP_PX + STATUS_PX;
@@ -51,5 +53,15 @@ export function boardVars({ height }: PuzzleSize): string {
         GAP_PX +
         STATUS_PX;
 
-    return [`--board-h: ${base}px`, `--board-h-sm: ${fromSm}px`].join('; ');
+    // Only the `sm` width needs a value: below `sm` the panel is `w-full`, and
+    // from `sm` on it shrink-wraps to the grid, so a placeholder with less
+    // content than the board would otherwise collapse to its text width.
+    const widthFromSm =
+        columns * CELL_PX_SM + GRID_BORDER_PX + PANEL_BORDER_PX + PANEL_PADDING_PX_SM;
+
+    return [
+        `--board-h: ${base}px`,
+        `--board-h-sm: ${fromSm}px`,
+        `--board-w-sm: ${widthFromSm}px`,
+    ].join('; ');
 }

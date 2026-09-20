@@ -1,11 +1,11 @@
-<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="8.5 3 7 18">
-    <path d="M12 3.75c1.24 1.24 1.86 2.4 1.86 3.5a1.86 1.86 0 1 1-3.72 0c0-1.1.62-2.26 1.86-3.5Z" />
-    <path d="M12 10.5v1.5" />
-    <path d="M9.75 12h4.5a.75.75 0 0 1 .75.75v7.5a.75.75 0 0 1-.75.75h-4.5a.75.75 0 0 1-.75-.75v-7.5a.75.75 0 0 1 .75-.75Z" />
+<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" class="size-6">
+    <path d="M12 3.75c1.24 1.24 1.86 2.4 1.86 3.5a1.86 1.86 0 1 1-3.72 0c0-1.1.62-2.26 1.86-3.5Z"></path>
+    <path d="M12 10.5v1.5"></path>
+    <path d="M9.75 12h4.5a.75.75 0 0 1 .75.75v7.5a.75.75 0 0 1-.75.75h-4.5a.75.75 0 0 1-.75-.75v-7.5a.75.75 0 0 1 .75-.75Z"></path>
     <style>
-        path { fill: #000; }
+        path { stroke: #7ABFC8; }
         @media (prefers-color-scheme: dark) {
-            path { fill: #FFF; }
+            path { stroke: #2F6F7A; }
         }
     </style>
 </svg>

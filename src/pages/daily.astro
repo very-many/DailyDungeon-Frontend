@@ -1,34 +1,42 @@
 ---
-import Dungeon from '../components/Dungeon.astro';
-import Footer from '../components/Footer.astro';
-import Icon from '../components/Icon.astro';
-import Layout from '../layouts/Layout.astro';
+import Dungeon from "../components/Dungeon.astro";
+import DungeonSkeleton from "../components/DungeonSkeleton.astro";
+import Footer from "../components/Footer.astro";
+import Icon from "../components/Icon.astro";
+import Layout from "../layouts/Layout.astro";
 ---
 
 <Layout>
-	<main class="mx-auto flex w-full max-w-4xl flex-1 flex-col sm:px-4 pb-16">
-		<section class="flex flex-col items-center pt-12 pb-8">
-			<h1 class="text-center text-2xl leading-[1.55] tracking-[3px] text-highlight sm:text-3xl">
-				<span class="block">DAILY</span>
-				<span class="block">DUNGEON</span>
-			</h1>
-			<p class="pt-4 text-center text-[8px] leading-5 text-tertiary sm:text-[9px]">
-				New dungeon every day
-			</p>
-			<a
-				href="/seed"
-				class="mt-6 inline-flex items-center gap-2 border-2 border-gold px-3 py-2 text-[8px] tracking-wide text-gold transition-colors hover:bg-gold/10"
-			>
-				<Icon name="dice" class="size-3" />
-				CUSTOM DUNGEON
-				<Icon name="arrow-right" class="size-3" />
-			</a>
-		</section>
+    <main class="mx-auto flex w-full max-w-4xl flex-1 flex-col sm:px-4 pb-16">
+        <section class="flex flex-col items-center pt-12 pb-8">
+            <h1
+                class="text-center text-2xl leading-[1.55] tracking-[3px] text-highlight sm:text-3xl"
+            >
+                <span class="block">DAILY</span>
+                <span class="block">DUNGEON</span>
+            </h1>
+            <p
+                class="pt-4 text-center text-[8px] leading-5 text-tertiary sm:text-[9px]"
+            >
+                New dungeon every day
+            </p>
+            <a
+                href="/seed"
+                class="mt-6 inline-flex items-center gap-2 border-2 border-gold px-3 py-2 text-[8px] tracking-wide text-gold transition-colors hover:bg-gold/10"
+            >
+                <Icon name="dice" class="size-3" />
+                CUSTOM DUNGEON
+                <Icon name="arrow-right" class="size-3" />
+            </a>
+        </section>
 
-		<Dungeon puzzleUrl="https://daily-dungeon-backend.vercel.app/api/v1/dungeon/daily" />
-	</main>
+        <Dungeon
+            puzzleUrl="https://daily-dungeon-backend.vercel.app/api/v1/dungeon/daily"
+            server:defer
+        >
+            <DungeonSkeleton slot="fallback" />
+        </Dungeon>
+    </main>
 
-	<Footer />
+    <Footer />
 </Layout>
-
-
