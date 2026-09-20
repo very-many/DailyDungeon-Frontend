@@ -26,6 +26,8 @@ const HEADER_CELL = `${BASE_CELL} cursor-default border-board-line bg-board-head
 const OCCUPIED_CELL = `${BASE_CELL} cursor-default border-board-line bg-board-occupied`;
 const EMPTY_CELL = `${BASE_CELL} cursor-pointer touch-none border-board-line bg-board hover:bg-board-hover`;
 const WALL_CELL = `${BASE_CELL} cursor-pointer touch-none border-wall bg-wall`;
+/** Wall inside a row/column that already has too many walls (same red as the count). */
+const WALL_CELL_OVER = `${BASE_CELL} cursor-pointer touch-none border-mark bg-mark`;
 
 const STATUS_BASE = 'font-primary min-h-6 text-center text-xs sm:text-sm';
 const STATUS_IDLE = `${STATUS_BASE} text-tertiary`;
@@ -223,6 +225,8 @@ export class DungeonGame {
 
   private applyCellState(cell: HTMLDivElement, x: number, y: number): void {
     if (this.walls[y][x]) {
+      // The over-count colour is applied by refreshWallStyles(), which runs
+      // after every change via updateCounts().
       cell.className = WALL_CELL;
       cell.replaceChildren();
       return;
@@ -254,6 +258,35 @@ export class DungeonGame {
         this.wallsPlacedInColumn(x, puzzle.height),
         puzzle.wall_counts.cols[x]
       );
+    }
+
+    this.refreshWallStyles();
+  }
+
+  /**
+   * Highlights walls that sit in an over-filled row or column, so the red
+   * count label is backed up by the board itself.
+   */
+  private refreshWallStyles(): void {
+    const puzzle = this.puzzle;
+    if (!puzzle) return;
+
+    const rowsOver: boolean[] = [];
+    const colsOver: boolean[] = [];
+    for (let y = 0; y < puzzle.height; y++) {
+      rowsOver[y] = this.wallsPlacedInRow(y) > puzzle.wall_counts.rows[y];
+    }
+    for (let x = 0; x < puzzle.width; x++) {
+      colsOver[x] = this.wallsPlacedInColumn(x, puzzle.height) > puzzle.wall_counts.cols[x];
+    }
+
+    for (let y = 0; y < puzzle.height; y++) {
+      for (let x = 0; x < puzzle.width; x++) {
+        if (!this.walls[y][x]) continue;
+        const cell = this.cells[y]?.[x];
+        if (!cell) continue;
+        cell.className = rowsOver[y] || colsOver[x] ? WALL_CELL_OVER : WALL_CELL;
+      }
     }
   }
 
