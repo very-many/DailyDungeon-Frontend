@@ -1,0 +1,17 @@
+---
+import ErrorLayout from "../layouts/ErrorLayout.astro";
+
+const requestedPath = Astro.url.pathname;
+---
+
+<ErrorLayout
+    code="404"
+    title={["LOST IN", "THE DUNGEON"]}
+    description="This corridor leads nowhere. The page you were looking for was walled off, renamed, or never existed at all."
+    monster={1}
+    accent="highlight"
+    details={[{ label: "YOU ASKED FOR", value: requestedPath }]}
+    map={["#####", "#..M#", "#####"]}
+    mapLabel="DEAD END"
+    caption="Every dead end contains a monster. This one is sitting on the page you wanted."
+/>

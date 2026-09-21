@@ -1,0 +1,29 @@
+---
+import ErrorLayout from "../layouts/ErrorLayout.astro";
+
+interface Props {
+    /** Astro hands the thrown value to this page automatically. */
+    error: unknown;
+}
+
+const { error } = Astro.props;
+
+// Keep the message out of production, where it can only leak internals. In dev
+// it is the one in-page hint, because a custom 500 page replaces the overlay.
+const message =
+    error instanceof Error ? error.message : typeof error === "string" ? error : "";
+const details =
+    import.meta.env.DEV && message ? [{ label: "ERROR", value: message }] : [];
+---
+
+<ErrorLayout
+    code="500"
+    title={["THE DUNGEON", "CAVED IN"]}
+    description="Something collapsed between you and your page. The scribes have been notified, so try again in a moment."
+    monster={2}
+    accent="mark"
+    details={details}
+    map={["#####", "##M##", "#####"]}
+    mapLabel="COLLAPSED"
+    caption="A cave-in seals the corridor. Whatever is left in there is still chewing."
+/>

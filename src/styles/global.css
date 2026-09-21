@@ -83,3 +83,11 @@ body {
     height: 32px;
     animation: sprite 1.5s steps(4) infinite;
 }
+
+.monster-row-1 {
+    background-position-y: -32px;
+}
+
+.monster-row-2 {
+    background-position-y: -64px;
+}

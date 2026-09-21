@@ -1,0 +1,177 @@
+---
+/**
+ * Full-page chrome for the error routes (`404.astro`, `500.astro`).
+ *
+ * Both routes are the same page with different copy, so the markup lives here
+ * once: a monster from the board sprite sheet, the status code, a way back into
+ * the dungeon, and a little dead-end grid that is drawn with the game's own
+ * board tokens. Everything uses the shared theme variables, so both colour
+ * schemes work without `dark:` variants.
+ */
+import Icon from "../components/Icon.astro";
+import Footer from "../components/Footer.astro";
+import SectionHeading from "../components/SectionHeading.astro";
+import Layout from "./Layout.astro";
+
+interface Props {
+    /** Status printed above the headline. */
+    code: string;
+    /** Headline, one entry per line. */
+    title: string[];
+    /** Copy under the headline. */
+    description: string;
+    /** Sprite sheet row: 0 happy, 1 alert, 2 deflated. */
+    monster?: 0 | 1 | 2;
+    /** Theme token used for the status and the headline. */
+    accent?: "highlight" | "gold" | "mark";
+    /** Small labelled chips, e.g. the route that was requested. */
+    details?: { label: string; value: string }[];
+    /** Decorative mini board: `#` wall, `.` floor, `M` monster. */
+    map?: string[];
+    /** Heading above the mini board. */
+    mapLabel?: string;
+    /** Caption under the mini board. */
+    caption?: string;
+}
+
+const {
+    code,
+    title,
+    description,
+    monster = 1,
+    accent = "highlight",
+    details = [],
+    map = [],
+    mapLabel,
+    caption,
+} = Astro.props;
+
+const accentClass = {
+    highlight: "text-highlight",
+    gold: "text-gold",
+    mark: "text-mark",
+}[accent];
+
+// Row 0 sits at the top of the sheet and needs no offset.
+const rowClass = monster === 0 ? "" : `monster-row-${monster}`;
+
+const buttons = {
+    base: "inline-flex items-center gap-2 border-4 px-6 py-4 font-primary text-[10px] leading-4 tracking-wide transition hover:-translate-y-0.5 active:translate-x-0.75 active:translate-y-0.75 active:shadow-none focus-visible:ring-2 focus-visible:ring-gold sm:px-8 sm:text-xs",
+    primary: "border-content bg-highlight text-background shadow-button-primary",
+    secondary: "border-line bg-elevated text-content shadow-button-secondary",
+};
+
+const columns = map[0]?.length ?? 0;
+const cells = map.flatMap((row) => [...row]);
+
+function cellClass(cell: string): string {
+    if (cell === "#") return "border-wall bg-wall";
+    if (cell === "M") return "border-board-line bg-board-occupied";
+    return "border-board-line bg-board";
+}
+---
+
+<Layout title={`${code} · Daily Dungeon`}>
+    <main class="mx-auto flex w-full max-w-3xl flex-1 flex-col items-center px-4 pb-16">
+        <section class="relative flex w-full flex-col items-center pt-14 pb-12">
+            <div aria-hidden="true" class="pointer-events-none absolute inset-0">
+                <Icon name="star" class="absolute top-6 left-2 size-3 text-highlight/70" />
+                <Icon name="star" class="absolute top-20 left-10 size-2 text-gold/60" />
+                <Icon name="star" class="absolute top-10 right-4 size-2 text-highlight/50" />
+                <Icon name="star" class="absolute top-28 right-12 size-3 text-gold/40" />
+            </div>
+
+            <div aria-hidden="true" class="flex size-16 items-center justify-center">
+                <span class:list={["monster block scale-200", rowClass]} />
+            </div>
+
+            <h1
+                class:list={[
+                    "pt-9 text-center text-3xl leading-[1.55] tracking-[3px] sm:text-5xl",
+                    accentClass,
+                ]}
+            >
+                {code}
+            </h1>
+
+            <h1 class="pt-7 text-center text-base leading-[1.8] tracking-[3px] text-content sm:text-lg">
+                {title.map((line) => <span class="block">{line}</span>)}
+            </h1>
+
+            <p class="max-w-md pt-5 text-center text-[8px] leading-5 text-tertiary sm:text-[9px]">
+                {description}
+            </p>
+
+            {
+                details.length > 0 && (
+                    <ul class="flex w-full flex-col items-center gap-2 pt-7">
+                        {details.map(({ label, value }) => (
+                            <li class="flex max-w-full flex-wrap items-center justify-center gap-2">
+                                <span class="text-[7px] tracking-[3px] text-tertiary sm:text-[8px]">
+                                    {label}
+                                </span>
+                                <code class="max-w-full truncate border-2 border-line bg-elevated px-2.5 py-1.5 text-[7px] text-content sm:text-[8px]">
+                                    {value}
+                                </code>
+                            </li>
+                        ))}
+                    </ul>
+                )
+            }
+
+            <div class="flex flex-wrap justify-center gap-4 pt-9">
+                <a href="/" class:list={[buttons.base, buttons.primary]}>
+                    <Icon name="home" class="size-4" />
+                    BACK HOME
+                </a>
+                <a href="/daily" class:list={[buttons.base, buttons.secondary]}>
+                    <Icon name="calendar" class="size-4" />
+                    DAILY DUNGEON
+                </a>
+                <a href="/seed" class:list={[buttons.base, buttons.secondary]}>
+                    <Icon name="dice" class="size-4" />
+                    CUSTOM DUNGEON
+                </a>
+            </div>
+        </section>
+
+        {
+            map.length > 0 && (
+                <section class="w-full pt-12">
+                    {mapLabel && <SectionHeading label={mapLabel} />}
+
+                    <div class="flex flex-col items-center gap-6 pt-6">
+                        <div
+                            aria-hidden="true"
+                            class="grid w-fit border-2 border-board-line bg-board shadow-panel"
+                            style={{
+                                gridTemplateColumns: `repeat(${columns}, minmax(0, 1fr))`,
+                            }}
+                        >
+                            {cells.map((cell) => (
+                                <span
+                                    class:list={[
+                                        "flex size-8 items-center justify-center border sm:size-9",
+                                        cellClass(cell),
+                                    ]}
+                                >
+                                    {cell === "M" && (
+                                        <span class:list={["monster", rowClass]} />
+                                    )}
+                                </span>
+                            ))}
+                        </div>
+
+                        {caption && (
+                            <p class="max-w-sm text-center text-[8px] leading-5 text-tertiary sm:text-[9px]">
+                                {caption}
+                            </p>
+                        )}
+                    </div>
+                </section>
+            )
+        }
+    </main>
+
+    <Footer />
+</Layout>
