@@ -9,9 +9,9 @@ const TOOL_INACTIVE = ['border-line', 'bg-elevated', 'text-tertiary'];
 
 // The puzzle is fetched server-side and inlined by Dungeon.astro. If the
 // backend was unreachable, the server already rendered an error message.
-const root: HTMLElement = document.getElementById('dungeon')!;
-const inlinePuzzle: string | undefined = root.dataset.puzzle;
-if (inlinePuzzle) {
+const root: HTMLElement | null = document.getElementById('dungeon');
+const inlinePuzzle: string | undefined = root?.dataset.puzzle;
+if (root && inlinePuzzle) {
   const game = new DungeonGame('dungeon', 'dungeon-status');
   game.loadPuzzle(JSON.parse(inlinePuzzle) as Puzzle);
   setupToolbar(game);
@@ -48,4 +48,9 @@ function setupToolbar(game: DungeonGame): void {
       setActive(tool);
     });
   }
+
+  // DungeonShell.astro renders the toolbar hidden so it can double as the
+  // deferred island's placeholder without popping in. The board is on screen
+  // and the buttons are wired up, so it can take part in the layout now.
+  toolbar.classList.remove('invisible');
 }

@@ -1,10 +1,9 @@
 ---
 import Dungeon from "../components/Dungeon.astro";
-import DungeonSkeleton from "../components/DungeonSkeleton.astro";
+import DungeonShell from "../components/DungeonShell.astro";
 import Footer from "../components/Footer.astro";
 import Icon from "../components/Icon.astro";
 import Layout from "../layouts/Layout.astro";
-import { boardVars, DEFAULT_PUZZLE_SIZE } from "../scripts/game/metrics";
 
 const seed = (Astro.url.searchParams.get("seed") ?? "").trim();
 const puzzleUrl = seed
@@ -55,22 +54,35 @@ const puzzleUrl = seed
                 autocomplete="off"
                 class="w-full border-2 border-line bg-elevated px-4 py-3 text-center text-xs text-content placeholder:text-tertiary/60 focus:border-highlight focus:outline-none"
             />
-            <button
-                type="submit"
-                class="mt-2 inline-flex cursor-pointer items-center gap-2 border-4 border-content bg-highlight px-6 py-3 text-[10px] tracking-wide text-background shadow-button-primary transition hover:-translate-y-0.5 active:translate-x-0.75 active:translate-y-0.75 active:shadow-none focus-visible:ring-2 focus-visible:ring-gold"
-            >
-                <Icon name="dice" class="size-4" />
-                LOAD DUNGEON
-            </button>
+            <div class="mt-2 flex flex-wrap items-center justify-center gap-3">
+                <button
+                    type="submit"
+                    class="inline-flex cursor-pointer items-center justify-center gap-2 border-4 border-content bg-highlight px-6 py-3 text-[10px] tracking-wide text-background shadow-button-primary transition hover:-translate-y-0.5 active:translate-x-0.75 active:translate-y-0.75 active:shadow-none focus-visible:ring-2 focus-visible:ring-gold"
+                >
+                    <Icon name="dice" class="size-4" />
+                    LOAD DUNGEON
+                </button>
+                <button
+                    id="seed-random"
+                    type="button"
+                    title="Roll a random seed"
+                    class="inline-flex cursor-pointer items-center justify-center gap-2 border-4 border-line bg-elevated px-6 py-3 text-[10px] tracking-wide text-content shadow-button-secondary transition hover:-translate-y-0.5 active:translate-x-0.75 active:translate-y-0.75 active:shadow-none focus-visible:ring-2 focus-visible:ring-gold"
+                >
+                    <Icon name="star" class="size-4" />
+                    RANDOM
+                </button>
+            </div>
         </form>
+
+        <script src="../scripts/seed.ts"></script>
 
         {
             puzzleUrl ? (
                 <Dungeon puzzleUrl={puzzleUrl} server:defer>
-                    <DungeonSkeleton slot="fallback" />
+                    <DungeonShell slot="fallback" busy />
                 </Dungeon>
             ) : (
-                <DungeonSkeleton message="">
+                <DungeonShell message="">
                     <Icon name="dice" class="size-8 text-tertiary" />
                     <p
                         id="dungeon-status"
@@ -78,7 +90,7 @@ const puzzleUrl = seed
                     >
                         Enter a seed to generate a dungeon.
                     </p>
-                </DungeonSkeleton>
+                </DungeonShell>
             )
         }
     </main>

@@ -1,6 +1,6 @@
 ---
 import Dungeon from "../components/Dungeon.astro";
-import DungeonSkeleton from "../components/DungeonSkeleton.astro";
+import DungeonShell from "../components/DungeonShell.astro";
 import Footer from "../components/Footer.astro";
 import Icon from "../components/Icon.astro";
 import Layout from "../layouts/Layout.astro";
@@ -34,7 +34,7 @@ import Layout from "../layouts/Layout.astro";
             puzzleUrl="https://daily-dungeon-backend.vercel.app/api/v1/dungeon/daily"
             server:defer
         >
-            <DungeonSkeleton slot="fallback" />
+            <DungeonShell slot="fallback" busy />
         </Dungeon>
     </main>
 

@@ -1,0 +1,95 @@
+---
+/**
+ * The board's chrome: wrapper, panel, status line and touch toolbar.
+ *
+ * `Dungeon.astro` (the `server:defer` island) renders this shell, and so does
+ * the `slot="fallback"` placeholder that the island later replaces. Both must
+ * produce the exact same box — same panel classes, same `boardVars` reservation
+ * — otherwise swapping the placeholder for the island moves the page around
+ * while the puzzle loads. Keeping one component in charge of the markup is what
+ * makes that hold; the callers only add inert extras (`data-puzzle`, for the
+ * script, or `aria-busy` for the placeholder).
+ *
+ * The toolbar is part of the shell too and ships `invisible`: it reserves the
+ * touch toolbar's height in the placeholder, but only `scripts/dungeon.ts`
+ * reveals it, once there is a board to paint tools for.
+ */
+import Icon from "./Icon.astro";
+import { boardVars, DEFAULT_PUZZLE_SIZE, type PuzzleSize } from "../scripts/game/metrics";
+
+interface Props {
+  /** Puzzle size whose finished box the shell reserves. */
+  size?: PuzzleSize;
+  /** Text of the status line. */
+  message?: string;
+  /** Paint the status in the warning colour (the puzzle could not be loaded). */
+  error?: boolean;
+  /** Render the touch toolbar (invisible until the game script shows it). */
+  toolbar?: boolean;
+  /** Serialized puzzle for the game script; only the island passes it. */
+  puzzle?: string;
+  /** Marks the shell as a placeholder that is still waiting for the island. */
+  busy?: boolean;
+}
+
+const {
+  size = DEFAULT_PUZZLE_SIZE,
+  message = "Loading puzzle…",
+  error = false,
+  toolbar = true,
+  puzzle,
+  busy = false,
+} = Astro.props;
+
+const toolButton =
+  'inline-flex cursor-pointer items-center gap-2 border-2 px-4 py-3 text-[9px] tracking-wide transition-colors';
+---
+
+<div class="flex w-full flex-col items-center">
+  <div
+    id="dungeon"
+    data-puzzle={puzzle}
+    aria-busy={busy ? 'true' : undefined}
+    style={boardVars(size)}
+    class="flex min-h-(--board-h) w-full flex-col items-center justify-center gap-4 overflow-x-auto border-2 border-line bg-surface p-1 sm:min-h-(--board-h-sm) sm:w-auto sm:min-w-(--board-w-sm) sm:p-6"
+  >
+    <p
+      id="dungeon-status"
+      class:list={[
+        'font-primary min-h-6 text-center text-xs',
+        error ? 'text-mark' : 'text-tertiary',
+        'sm:text-sm',
+      ]}
+    >
+      {message}
+    </p>
+    <slot />
+  </div>
+  {
+    toolbar ? (
+      <div
+        id="dungeon-toolbar"
+        class="invisible pointer-coarse:flex hidden flex-wrap items-center justify-center gap-3 pt-4"
+      >
+        <button
+          type="button"
+          data-tool="wall"
+          aria-pressed="true"
+          class:list={[toolButton, 'border-line', 'bg-elevated', 'text-tertiary']}
+        >
+          <Icon name="brick" class="size-4" />
+          WALL
+        </button>
+        <button
+          type="button"
+          data-tool="mark"
+          aria-pressed="false"
+          class:list={[toolButton, 'border-line', 'bg-elevated', 'text-tertiary']}
+        >
+          <Icon name="cross" class="size-4" />
+          MARK
+        </button>
+      </div>
+    ) : null
+  }
+</div>

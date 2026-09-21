@@ -1,10 +1,11 @@
 ---
-import Icon from "./Icon.astro";
-import { boardVars, DEFAULT_PUZZLE_SIZE, type PuzzleSize } from "../scripts/game/metrics";
+import DungeonShell from "./DungeonShell.astro";
+import { DEFAULT_PUZZLE_SIZE, type PuzzleSize } from "../scripts/game/metrics";
 
 interface Props {
   puzzleUrl: string;
 }
+
 const { puzzleUrl } = Astro.props;
 
 let puzzle: unknown = null;
@@ -30,55 +31,17 @@ function readSize(value: unknown): PuzzleSize {
 
 const size = readSize(puzzle);
 
-const toolButton =
-  'inline-flex cursor-pointer items-center gap-2 border-2 px-4 py-3 text-[9px] tracking-wide transition-colors';
+// The shell is shared with the `slot="fallback"` placeholder on /daily and
+// /seed, so the island's first paint is pixel-identical to the placeholder it
+// replaces: the only step left for the user to see is the board replacing the
+// status line.
 ---
 
-<div class="flex w-full flex-col items-center">
-  <div
-    id="dungeon"
-    data-puzzle={puzzle ? JSON.stringify(puzzle) : undefined}
-    style={boardVars(size)}
-    class="flex min-h-(--board-h) w-full flex-col items-center justify-center gap-4 overflow-x-auto border-2 border-line bg-surface p-1 sm:min-h-(--board-h-sm) sm:w-auto sm:p-6"
-  >
-    <p
-      id="dungeon-status"
-      class={
-        puzzle
-          ? 'font-primary min-h-6 text-center text-xs text-tertiary sm:text-sm'
-          : 'font-primary min-h-6 text-center text-xs text-mark sm:text-sm'
-      }
-    >
-      {puzzle ? 'Loading puzzle…' : 'Failed to load puzzle.'}
-    </p>
-  </div>
-  {
-    puzzle ? (
-      <div
-        id="dungeon-toolbar"
-        class="pointer-coarse:flex hidden flex-wrap items-center justify-center gap-3 pt-4"
-      >
-        <button
-          type="button"
-          data-tool="wall"
-          aria-pressed="true"
-          class:list={[toolButton, 'border-line', 'bg-elevated', 'text-tertiary']}
-        >
-          <Icon name="brick" class="size-4" />
-          WALL
-        </button>
-        <button
-          type="button"
-          data-tool="mark"
-          aria-pressed="false"
-          class:list={[toolButton, 'border-line', 'bg-elevated', 'text-tertiary']}
-        >
-          <Icon name="cross" class="size-4" />
-          MARK
-        </button>
-      </div>
-    ) : null
-  }
-</div>
+<DungeonShell
+  size={size}
+  puzzle={puzzle ? JSON.stringify(puzzle) : undefined}
+  error={!puzzle}
+  message={puzzle ? undefined : 'Failed to load puzzle.'}
+/>
 
 <script src="../scripts/dungeon.ts"></script>
