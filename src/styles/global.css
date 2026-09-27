@@ -91,3 +91,43 @@ body {
 .monster-row-2 {
     background-position-y: -64px;
 }
+
+@keyframes flame {
+    from {
+        background-position-x: -54px;
+    }
+    to {
+        background-position-x: -566px;
+    }
+}
+
+/*
+ * flame.png is a 256x64 sheet: four 64x64 frames, each with the actual 10x16
+ * pixel flame in its middle. The box crops to exactly that flame, drawn at 2x
+ * so the pixels stay square — hence the 512x128 background (2x the sheet), the
+ * -54/-40px offset onto frame 0's flame, and the 4 x 128px travel the animation
+ * steps through (one frame per step).
+ */
+.flame {
+    display: block;
+    flex: none;
+    width: 20px;
+    height: 32px;
+    background-image: url("/flame.png");
+    background-size: 512px 128px;
+    background-position: -54px -40px;
+    image-rendering: pixelated;
+    animation: flame 0.8s steps(4) infinite;
+}
+
+/* No streak yet: the flame is unlit, i.e. grey and frozen. `data-streak` is set
+   by scripts/streak.ts. */
+[data-streak="0"] .flame {
+    animation: none;
+    filter: grayscale(1);
+    opacity: 0.5;
+}
+
+[data-streak="0"] .streak-count {
+    color: var(--color-tertiary);
+}

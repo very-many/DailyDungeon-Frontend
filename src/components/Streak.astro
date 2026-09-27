@@ -1,0 +1,26 @@
+---
+/**
+ * Daily streak badge: the animated flame plus the number of days in a row the
+ * player has finished the daily dungeon.
+ *
+ * localStorage is the only source of truth, so the server always renders the
+ * cold (zero) state; `scripts/streak.ts` swaps in the stored streak right after
+ * hydration and again when a day is solved on the open page.
+ */
+---
+
+<div
+    id="streak"
+    data-streak="0"
+    title="Days in a row with a finished daily dungeon"
+    class="flex items-center gap-3 border-2 border-line bg-elevated px-4 py-2"
+>
+    <span class="flame" aria-hidden="true"></span>
+    <p
+        class="font-primary text-[8px] leading-5 tracking-wide text-tertiary sm:text-[9px]"
+    >
+        <span id="streak-count" class="streak-count text-gold">0</span> DAY STREAK
+    </p>
+</div>
+
+<script src="../scripts/streak.ts"></script>

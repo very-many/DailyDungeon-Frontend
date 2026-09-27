@@ -1,4 +1,5 @@
-import { DungeonGame } from './game/DungeonGame';
+import { DUNGEON_WIN_EVENT, DungeonGame } from './game/DungeonGame';
+import { hasCompleted, markCompleted } from './game/progress';
 import type { Puzzle } from './game/types';
 
 type Tool = 'wall' | 'mark';
@@ -12,9 +13,32 @@ const TOOL_INACTIVE = ['border-line', 'bg-elevated', 'text-tertiary'];
 const root: HTMLElement | null = document.getElementById('dungeon');
 const inlinePuzzle: string | undefined = root?.dataset.puzzle;
 if (root && inlinePuzzle) {
+  const puzzle: Puzzle = JSON.parse(inlinePuzzle) as Puzzle;
   const game = new DungeonGame('dungeon', 'dungeon-status');
-  game.loadPuzzle(JSON.parse(inlinePuzzle) as Puzzle);
+  game.loadPuzzle(puzzle);
   setupToolbar(game);
+  if (puzzle.date) setupDailyProgress(root, puzzle, game);
+}
+
+/**
+ * The daily dungeon is the only request the backend dates (custom seeds come
+ * back with `date: null`), which makes it the only one that keeps progress: a
+ * finished day is stored, and a day that is already finished shows its solution
+ * right away instead of an empty board.
+ */
+function setupDailyProgress(
+  root: HTMLElement,
+  puzzle: Puzzle,
+  game: DungeonGame,
+): void {
+  if (hasCompleted(puzzle.seed)) {
+    game.applySolution();
+    return;
+  }
+
+  root.addEventListener(DUNGEON_WIN_EVENT, (): void =>
+    markCompleted(puzzle.seed),
+  );
 }
 
 /**

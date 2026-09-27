@@ -9,7 +9,8 @@ export interface Monster extends Treasure {
 
 export interface Puzzle {
   seed: string;
-  date: string;
+  /** ISO date of the daily dungeon; `null` for custom seeds. */
+  date: string | null;
   width: number;
   height: number;
   wall_counts: { rows: number[]; cols: number[] };

@@ -40,6 +40,12 @@ const COUNT_OVER = "text-mark";
 /** The tools available on touch devices (selected via the mobile toolbar). */
 type Tool = "wall" | "mark";
 
+/**
+ * Fired on the board element when the player solves the puzzle, so page-level
+ * scripts can persist the result. Custom dungeons just ignore it.
+ */
+export const DUNGEON_WIN_EVENT = "dungeon:win";
+
 export class DungeonGame {
     private readonly root: HTMLElement;
     private readonly statusEl: HTMLElement;
@@ -96,6 +102,30 @@ export class DungeonGame {
     /** Switch the tool used for touch input (mobile toolbar). */
     setTool(tool: Tool): void {
         this.tool = tool;
+    }
+
+    /**
+     * Show the finished board without playing it, for a daily dungeon that was
+     * already solved on an earlier visit. The board is left inert because the
+     * puzzle counts as won.
+     */
+    applySolution(): void {
+        const puzzle = this.puzzle;
+        if (!puzzle) return;
+
+        for (let y = 0; y < puzzle.height; y++) {
+            for (let x = 0; x < puzzle.width; x++) {
+                this.walls[y][x] = puzzle.solution[y][x] === 1;
+            }
+        }
+        this.marks = this.emptyGrid();
+
+        this.won = true;
+        this.stopDrag();
+        this.applyInitialCellStates();
+        this.updateCounts();
+        this.statusEl.textContent = "Already solved!";
+        this.statusEl.className = STATUS_WON;
     }
 
     private reset(): void {
@@ -459,8 +489,29 @@ export class DungeonGame {
     private checkWin(): void {
         if (this.won || !this.isSolved()) return;
         this.won = true;
+        // The puzzle is solved, so the markers are just leftover noise; drop
+        // them so the finished board shows only the walls.
+        this.clearMarks();
+        this.stopDrag();
         this.statusEl.textContent = "You win!";
         this.statusEl.className = STATUS_WON;
+        // Only the daily dungeon listens for this (see scripts/dungeon.ts).
+        this.root.dispatchEvent(
+            new CustomEvent(DUNGEON_WIN_EVENT, { bubbles: true }),
+        );
+    }
+
+    /** Remove every "not a wall" marker from the board. */
+    private clearMarks(): void {
+        if (!this.puzzle) return;
+        for (let y = 0; y < this.puzzle.height; y++) {
+            for (let x = 0; x < this.puzzle.width; x++) {
+                if (!this.marks[y][x]) continue;
+                this.marks[y][x] = false;
+                const cell = this.cells[y]?.[x];
+                if (cell) this.applyCellState(cell, x, y);
+            }
+        }
     }
 
     private isSolved(): boolean {
