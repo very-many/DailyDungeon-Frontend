@@ -1,5 +1,6 @@
 ---
 import Icon from "./Icon.astro";
+import Streak from "./Streak.astro";
 import ToggleDarkmode from "./ToggleDarkmode.astro";
 
 interface NavLink {
@@ -35,8 +36,11 @@ function itemClass(active: boolean, layout: string, activeExtra = ""): string[] 
 ---
 
 <nav class="relative z-30 border-b-[3px] border-line bg-surface shadow-nav">
-    <div class="flex h-14 items-stretch justify-between px-5">
-        <a href="/" class="flex items-center gap-2.5 px-2 text-highlight">
+    <div class="grid h-14 grid-cols-[1fr_auto_1fr] items-stretch px-5">
+        <a
+            href="/"
+            class="flex w-fit items-center gap-2.5 justify-self-start px-2 text-highlight"
+        >
             <Icon name="candle" class="size-6" />
             <span class="text-center font-primary text-xs leading-4 tracking-widest">
                 <span class="block">DAILY</span>
@@ -44,8 +48,16 @@ function itemClass(active: boolean, layout: string, activeExtra = ""): string[] 
             </span>
         </a>
 
+        <!-- The middle column is `auto` between two equal `1fr` columns, which
+             is what keeps the badge centred no matter how wide the logo and
+             the navigation are. It is the first thing dropped on very narrow
+             screens, where the row has no room left for it. -->
+        <div class="flex items-center justify-center max-[360px]:hidden">
+            <Streak />
+        </div>
+
         <!-- Desktop navigation -->
-        <div class="hidden items-stretch sm:flex">
+        <div class="hidden items-stretch justify-self-end sm:flex">
             {
                 links.map(({ href, icon, label }) => {
                     const active = isCurrent(href);
@@ -72,7 +84,7 @@ function itemClass(active: boolean, layout: string, activeExtra = ""): string[] 
         </div>
 
         <!-- Compact navigation -->
-        <div class="flex items-stretch sm:hidden">
+        <div class="flex items-stretch justify-self-end sm:hidden">
             <ToggleDarkmode />
             <button
                 type="button"

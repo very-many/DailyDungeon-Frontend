@@ -1,26 +1,79 @@
 ---
 /**
  * Daily streak badge: the animated flame plus the number of days in a row the
- * player has finished the daily dungeon.
+ * player has finished the daily dungeon. It sits in the middle of the navbar
+ * (see Navbar.astro), so it appears on every page; below `md` it drops the
+ * label and keeps the flame and the count, which is all the row can spare
+ * next to the logo and the navigation.
  *
- * localStorage is the only source of truth, so the server always renders the
- * cold (zero) state; `scripts/streak.ts` swaps in the stored streak right after
- * hydration and again when a day is solved on the open page.
+ * localStorage is the only source of truth, so the server can only render the
+ * cold (zero) state. The boot script below counts the stored days while the
+ * page is still being parsed — before the badge is drawn — and `scripts/streak.ts`
+ * renders the same value again once it runs (and after a win on the open page).
  */
+interface Props {
+    /** Draw the badge as its own panel instead of sitting flush in the navbar. */
+    background?: boolean;
+}
+
+const { background = false } = Astro.props;
+
+const badgeClass = [
+    "flex items-center gap-3",
+    background ? "border-2 border-line bg-elevated px-4 py-2" : "px-2 py-1 sm:px-3",
+].join(" ");
 ---
 
 <div
     id="streak"
     data-streak="0"
     title="Days in a row with a finished daily dungeon"
-    class="flex items-center gap-3 border-2 border-line bg-elevated px-4 py-2"
+    class={badgeClass}
 >
     <span class="flame" aria-hidden="true"></span>
     <p
         class="font-primary text-[8px] leading-5 tracking-wide text-tertiary sm:text-[9px]"
     >
-        <span id="streak-count" class="streak-count text-gold">0</span> DAY STREAK
+        <span class="sr-only md:hidden">Day streak:</span>
+        <span id="streak-count" class="streak-count text-gold">0</span>
+        <span class="hidden md:inline"> DAY STREAK</span>
     </p>
 </div>
+
+<!--
+    Runs during parsing, i.e. before the badge is painted: a bundled `<script>`
+    is a deferred module and always lands after the first frame. This is the
+    streak rule written a second time on purpose — an `is:inline` script cannot
+    import it, and a copy that is always right beats a cached answer that can go
+    stale. Keep it in step with `currentStreak` in scripts/game/progress.ts.
+-->
+<script is:inline>
+    try {
+        const days = new Set(
+            JSON.parse(localStorage.getItem("daily-dungeon:completed") || "[]"),
+        );
+        // Days are stored as ISO dates and the backend seeds the daily with
+        // `date.today()`, so "today" is the UTC date here as well. Anything in
+        // there that is not a date simply never matches a cursor.
+        const utcDay = (date) => date.toISOString().slice(0, 10);
+
+        // Today may still be unplayed, and then the chain is counted from
+        // yesterday, exactly like currentStreak() does.
+        const cursor = new Date();
+        if (!days.has(utcDay(cursor))) cursor.setUTCDate(cursor.getUTCDate() - 1);
+
+        let streak = 0;
+        while (days.has(utcDay(cursor))) {
+            streak++;
+            cursor.setUTCDate(cursor.getUTCDate() - 1);
+        }
+
+        document.getElementById("streak").dataset.streak = String(streak);
+        document.getElementById("streak-count").textContent = String(streak);
+    } catch {
+        // No storage, or nothing readable in it: the module script renders the
+        // cold state a frame later.
+    }
+</script>
 
 <script src="../scripts/streak.ts"></script>

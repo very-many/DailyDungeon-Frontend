@@ -1,9 +1,10 @@
 /**
- * Fills in the daily streak badge (`Streak.astro`) from localStorage.
+ * Keeps the daily streak badge (`Streak.astro`) up to date from localStorage.
  *
- * The badge ships the cold, zero state because the server cannot know about
- * local storage; this script swaps in the stored streak once its bundle runs
- * and again whenever a day is recorded while the page is open.
+ * The badge's boot script already puts the streak on screen during parsing, so
+ * what this module adds is the live update when a day is finished while the page
+ * is open — and a re-render on load, which covers a page where that inline
+ * script did not run.
  */
 import { currentStreak, PROGRESS_EVENT } from "./game/progress";
 

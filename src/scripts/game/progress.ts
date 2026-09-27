@@ -65,6 +65,11 @@ function previousDay(iso: string): string {
     return day.toISOString().slice(0, 10);
 }
 
+/**
+ * The rule above is mirrored by the boot script in `Streak.astro`, which cannot
+ * import anything and has to run before the first frame — keep the two in step.
+ */
+
 function readSeeds(): string[] {
     try {
         const raw = localStorage.getItem(STORAGE_KEY);
