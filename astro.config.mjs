@@ -5,16 +5,23 @@ import tailwindcss from '@tailwindcss/vite';
 
 import vercel from '@astrojs/vercel';
 
+import sitemap from '@astrojs/sitemap';
+
 // https://astro.build/config
 export default defineConfig({
   vite: {
     plugins: [tailwindcss()]
   },
+
   output: 'server',
+
   adapter: vercel({
     webAnalytics: {
       enabled: true,
     },
     maxDuration: 8,
   }),
+
+  site: 'https://www.dailydungeon.gr',
+  integrations: [sitemap()],
 });
