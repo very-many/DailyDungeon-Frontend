@@ -1,14 +1,45 @@
 ---
 import Navbar from "../components/Navbar.astro";
-import ToggleDarkmode from "../components/ToggleDarkmode.astro";
 import "../styles/global.css";
 
 interface Props {
     /** Browser tab title. Error routes pass their own. */
     title?: string;
+    /** Meta description for search results and link previews. */
+    description?: string;
 }
 
-const { title = "Daily Dungeon" } = Astro.props;
+const {
+    title = "Daily Dungeon",
+    description = "One new dungeon every day, the same puzzle for everyone. Solve the daily dungeon, keep your streak alive, or conjure a custom one from a seed.",
+} = Astro.props;
+
+const canonical = new URL(Astro.url.pathname, Astro.site);
+
+// Share preview image. Must be absolute and a PNG/JPG (most platforms ignore
+// SVG); 1200x630 is what Discord/Slack/X expect. `public/og.png` does not exist
+// yet, so this resolves to a 404 until the asset is added.
+const ogImage = new URL("/og.png", Astro.site).href;
+
+// The app schema describes the site as a whole, so it is emitted on the
+// homepage only — repeating it on /daily and /seed would be duplicate markup.
+const isHome = Astro.url.pathname === "/";
+const structuredData = {
+    "@context": "https://schema.org",
+    "@graph": [
+        { "@type": "WebSite", name: "Daily Dungeon", url: canonical.origin },
+        {
+            "@type": "WebApplication",
+            name: "Daily Dungeon",
+            url: canonical.origin,
+            applicationCategory: "GameApplication",
+            operatingSystem: "Any",
+            browserRequirements: "Requires JavaScript",
+            description,
+            offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
+        },
+    ],
+};
 ---
 
 <!doctype html>
@@ -17,10 +48,40 @@ const { title = "Daily Dungeon" } = Astro.props;
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width" />
         <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-        <link rel="icon" href="/favicon.ico" />
         <link rel="sitemap" href="/sitemap-index.xml" />
+        <link rel="canonical" href={canonical.href} />
         <meta name="generator" content={Astro.generator} />
+        <meta name="description" content={description} />
         <title>{title}</title>
+
+        <!-- Open Graph: Discord, Slack, WhatsApp, LinkedIn, iMessage, … -->
+        <meta property="og:type" content="website" />
+        <meta property="og:site_name" content="Daily Dungeon" />
+        <meta property="og:title" content={title} />
+        <meta property="og:description" content={description} />
+        <meta property="og:url" content={canonical.href} />
+        <meta property="og:image" content={ogImage} />
+        <meta property="og:image:width" content="1200" />
+        <meta property="og:image:height" content="630" />
+        <meta property="og:image:alt" content="Daily Dungeon, a pixel-art daily puzzle" />
+
+        <!-- Twitter/X has its own tags and falls back to Open Graph for the rest. -->
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content={title} />
+        <meta name="twitter:description" content={description} />
+        <meta name="twitter:image" content={ogImage} />
+        <meta name="twitter:image:alt" content="Daily Dungeon, a pixel-art daily puzzle" />
+
+        {
+            isHome && (
+                <script
+                    is:inline
+                    type="application/ld+json"
+                    set:html={JSON.stringify(structuredData)}
+                />
+            )
+        }
+
         <script is:inline>
             document.documentElement.classList.toggle(
                 "dark",
